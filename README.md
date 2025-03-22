@@ -60,4 +60,9 @@ Procedure:
 > commix is sth like sqlmap :)
 
 
-# IM AT 7 video :|
+## RCE
+rce means u can put code in web app.
+for inline import in python u can use this:
+```python
+__import__('PACKAGE_NAME').FUNCTINON('ARGS')
+```
