@@ -112,3 +112,23 @@ there is no view here but we have time effect.
 
 *so we use blind sqli as a **time based***
 
+### Explotation Flow
+Based on user privilage we can do many things:
+- pulling data from each databse that user has access
+- read file
+- write file
+-  command excutaion
+
+for extracting data u should know, ***data base name***, ***table name*** and ***column name***.
+
+> **sqli** -> extract database names -> extract table names -> extract column names -> **pulling out data**
+
+we can pull information with **information_schema**:
+- `SELECT schema_name FROM information.schema.schemata` -> shows all database which the user has access to
+- `SELECT table_name FROM information.schema.tables` -> shows all tables which the user has access to
+- `SELECT column_name FROM information.schema.columns` -> shows all columns which the user has access to
+
+u can use various fliters. for examle in this query it retunrns only column names of a specific database and table:
+```SQL
+SELECT group_concat(cloumn_name) FROM information.schema.columns WHERE table_schema='DATABASE_NAME' AND table_name='TABLE_NAME' 
+```
