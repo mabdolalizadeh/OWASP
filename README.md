@@ -66,3 +66,49 @@ for inline import in python u can use this:
 ```python
 __import__('PACKAGE_NAME').FUNCTINON('ARGS')
 ```
+
+## SQL Injection
+in sqli we wanna exploit the query.
+this is a simple sqli
+```sql
+SELECT FROM USER WHERE username = ''; SELECT 1=1; --
+```
+
+### intraction
+we have three kind of intraction between web app and sql.
+- data returns directly to user
+- data processed and the result shows to user
+- nothing returns to user
+
+#### Direct
+look at this example:
+> https://site.com/news/54
+
+in this case 54 is id of a data in sql so the qury must be like one of this:
+```sql
+SELECT * FROM news WHERE news_id = $NEWSID;
+SELECT * FROM news WHERE news_id = '$NEWSID';
+SELECT * FROM news WHERE news_id = "$NEWSID";
+```
+so it shows all thing to us directly and we can exploit it by **UNION**.
+
+#### Indirect
+suppose we wanna buy sth from a shop and when we click on a product it query to sql and if it has it shows us exist else doesnt exist.
+so in this case data is porocessed and then the result shown us.
+query must be like this:
+```sql
+SELECT IF ((SELECT count FROM products WHERE product_id = $PRODUCT_ID) > 0, 1, 0) # 0 or 1
+```
+here doesnt show data just an effect of it.
+
+*We use blind sqli in this case **(boolean based)***
+
+#### NO result
+for example for users and ips of a web app it doesnt show u any data. but will do sth.
+```sql
+INSERT INTO table_name VALUES (value1, value2, ...)
+```
+there is no view here but we have time effect.
+
+*so we use blind sqli as a **time based***
+
