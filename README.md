@@ -267,17 +267,3 @@ in ssti:
   is sth like sqlmap :)
   
   [here](https://github.com/epinna/tplmap?tab=readme-ov-file) is github repository of it.
-
-
-
-## CORS (Cross Origin Resource Sharing)
-if sop prevents us we have 3 way to share data:
-- postMessage -> sending and receiving messages between two different origin
-- JSONP -> using `<script>` to transfer js objects
-- CORS -> modifying sop by some special response headers
-
-example for response headers:
-- `Acess-Control-Allow-Origin: <Origin> | *`
-- `Acess-Control-Allow-Credentials: true`
-
-> the browser always put the **correct origin** in the request by **Origin** HTTP header, it can't be spoofed or modified by js.
