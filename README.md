@@ -281,3 +281,45 @@ example for response headers:
 - `Acess-Control-Allow-Credentials: true`
 
 > the browser always put the **correct origin** in the request by **Origin** HTTP header, it can't be spoofed or modified by js.
+
+### Checker Function
+a good time that *CORS* will appear is when a company wanna be scaled.
+so they write a fucntion to verify origin or deny it.
+the function may be vulnurable.
+so how it be vulnarable? look the following code(its node js):
+```js
+app.get('/user/info', (req, res) => {
+  if (req.header.origin.indexOf("mysite.com") < 0>) {
+    // scurity failed
+    // no CORS here
+    // exit
+  } else {
+    add_cors_headers(req.headers.origin); // returns: ACAO: req.headers.origin; ACAC=True
+  }
+
+  var user_obj = get_user_data(req.session.user_id);
+  res.render('result');
+});
+```
+of course we cant send `https://attacker.com/` as a Origin header but we can send `https://mysite.com.attacker.com` as Origin.
+
+### The Vulnarable CORSs
+if a site (`company.com`) works with cookies and has an endpoint which returns sensitive information, the following cases r vulnarable:
+> NOTE: in all cases the cookie's **SameSite** must be **none**.
+
+- case 1:
+  - `Access-Control-Allow-Origin: https://attacker.com`
+  - `Access-Control-Allow-Credentials: True`
+- case 2: 
+  - `Access-Control-Allow-Origin: https://company.com.attacker.com`
+  - `Access-Control-Allow-Credentials: True`
+- case 3: 
+  - `Access-Control-Allow-Origin: null`
+  - `Access-Control-Allow-Credentials: True`
+- case 4 - *vulnarable if any of subdomains r vulnarable to xss: 
+  - `Access-Control-Allow-Origin: https://anysub.company.com`
+  - `Access-Control-Allow-Credentials: True`
+
+when u see `Access-Control-Allow-Origin: https://attacker.com` and `Access-Control-Allow-Credentials: True` dont rush to report the vulnarablity. just report when u exploit it completely.
+
+> see [this](https://www.youtube.com/watch?v=AUQSYobXbZI) for better view *(part of CORS misconfiguration)*.
