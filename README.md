@@ -329,4 +329,4 @@ when u see `Access-Control-Allow-Origin: https://attacker.com` and `Access-Contr
 <details>
 <summary>Let's Read</summary>
 > see [this](https://www.youtube.com/watch?v=AUQSYobXbZI) for better view *(part of CORS misconfiguration)*.
-<details>
+</details>
