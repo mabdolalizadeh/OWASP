@@ -134,11 +134,21 @@ Based on user privilage we can do many things:
 
 for extracting data u should know, ***data base name***, ***table name*** and ***column name***.
 
-> **sqli** -> extract database names -> extract table names -> extract column names -> **pulling out data**
-
 ```mermaid
-Title: Flow of sqli extracting data.
-A->B: hi
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+flowchart LR
+  A[Extract Database Names]:::blue --> B[Extract Table Names]:::green
+  B --> C[Extract Column Names]:::yellow
+  C --> D[Pulling Out Data]:::red
+
+  classDef blue fill:#1E90FF,stroke:#000,stroke-width:2px,color:#fff;
+  classDef green fill:#32CD32,stroke:#000,stroke-width:2px,color:#fff;
+  classDef yellow fill:#FFD700,stroke:#000,stroke-width:2px,color:#fff;
+  classDef red fill:#FF4500,stroke:#000,stroke-width:2px,color:#fff;
 ```
 
 we can pull information with **information_schema**:
@@ -197,6 +207,7 @@ so we get that the first `SELECT` select 3 column. in the end we exploit like th
 page/?id=54 UNION SELECT 1,2,3#
 ```
 
+> [!TIP]
 > if u rn't allowed to use qoute(s), u can use HEX code only and only for strings.
 
 
@@ -230,6 +241,7 @@ page/?id=54 UNION SELECT 1,2,3#
     page/?id=54" and sleep(10)#
     ```
 
+> [!WARNING]
 > sometimes mostly when u seeing a search box query isnt like this `keyword = $INPUT` its like this `keyword like '%INPUT%'` b/c in search we dont wanna exact word. so in this case we need to change our injection to this: `test%' and 1=1#`
 
 for exploiting data:
@@ -293,6 +305,7 @@ example for response headers:
 - `Acess-Control-Allow-Origin: <Origin> | *`
 - `Acess-Control-Allow-Credentials: true`
 
+> [!IMPORTANT]
 > the browser always put the **correct origin** in the request by **Origin** HTTP header, it can't be spoofed or modified by js.
 
 ### Checker Function
@@ -318,7 +331,8 @@ of course we cant send `https://attacker.com/` as a Origin header but we can sen
 
 ### The Vulnarable CORSs
 if a site (`company.com`) works with cookies and has an endpoint which returns sensitive information, the following cases r vulnarable:
-> NOTE: in all cases the cookie's **SameSite** must be **none**.
+> [!NOTE]
+> in all cases the cookie's **SameSite** must be **none**.
 
 - case 1:
   - `Access-Control-Allow-Origin: https://attacker.com`
