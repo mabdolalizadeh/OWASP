@@ -408,3 +408,47 @@ for example u make a payload that send a request to change password in a specifi
 </body>
 </html>
 ```
+### CSRF Protection
+there r lots of protection to protect **CSRF**.
+- using **CSRF token** for preventing forgery.*(most use)*
+- checking `Referer` but function to check must be **safe**.
+- using a costume header or any thing that makes HTTP request **complex**.
+
+lets review anti csrf token mechanism:
+- user sends HTTP req to change password form. *GET request*
+- in the response, server returns an anti CSRF token **bound** to **the user's session**.
+- user enters a new password and submit the form. and send a **POST request** to server and send *CSRF token* too.
+- based on the session csrf token will be checked in the server.
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+sequenceDiagram
+    actor User
+    participant Website
+    User-)Website: GET /change_password.html
+    Website-)User: CSRF Token 
+    Note right of Website: Sess.generate.token
+    User-)Website: POST /change_password.html + CSRF token + Session
+    Website-)User: Done 
+    Note right of Website: Sess.generate.token
+```
+
+### XSS
+XSS is a vulnarabilty that u can inject malicious JavaScript code. there r two types of XSS:
+- Normal XSS -> occurs when HTML parse by browser
+- DOM XSS -> occurs when js excuted as a result of modifying DOM 
+each type can be **reflected** or **Stored**. in the reflected mode no data is saved in the server, so exploit should be delivered to the user by a side channal. in the stored mode the payload is save to server by visiting vulnarable page automutically.
+
+> [!TIP]
+> there is also an XSS named **Blind XSS** blind b/c we cannot see result of our payload. we inject payload and hope to vulnarbility.
+
+there is many XSS vectors some popular ones:
+```html
+<script>alert(origing)</script>
+<img src=x onerror=alert(origin)>
+<svg onload=alert(origin)>
+```
