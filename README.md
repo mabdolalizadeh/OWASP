@@ -434,7 +434,7 @@ sequenceDiagram
     Note right of Website: Sess.generate.token
     User-)Website: POST /change_password.html + CSRF token + Session
     Website-)User: Done 
-    Note right of Website: Sess.generate.token
+    Note right of Website: token validation
 ```
 
 ### XSS
@@ -452,3 +452,101 @@ there is many XSS vectors some popular ones:
 <img src=x onerror=alert(origin)>
 <svg onload=alert(origin)>
 ```
+
+## Open redirect
+open redirect is:
+- web app redirect user based on untrusted input
+- can be leveraged achived by xss
+- can be leveraged to acct takeover in some authentication flow
+- can be leveraged to bypass ssrf domain whitelist to achieve full-blown ssrf
+- it redirect vitim from a site to a phishing
+- it can occur header based or html/js based
+
+lets see a header based:
+```python
+from flask import Flask, request, redirect
+app = Flask(__name__)
+
+@app.route("/")
+def page():
+  next = request.value.get('next')
+  if next:
+    return redirect(next)
+  else:
+    return 'hi :)'
+
+if __name__ == '__main__':
+  app.run(host="0.0.0.0", port=80)
+```
+
+lets see a js based:
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="veiwport" content="width=device-width, initial-scale=1">
+    <title>redirector</title>
+    <script type="text/javascript">
+      if(windows.location.hash) {
+        var hash = windows.location.hash.substring(1); // puts hash in variable and remove # char
+        windows.location = hash; // hash found
+      }
+    </script>
+  </head>
+</html>
+```
+
+### bypassing protection
+for protecting redirect developers put a checker function:
+```php
+<?php
+function check_hmac($url, $hmac) {
+  return ($hmac == md5($url));
+}
+
+if (isset($_GET['url']) && isset($_GET['h'])) {
+  if (check_hmac($_GET['url'], $_GET['h'])) header('Location: ' . $_GET['url']);
+  else echo "Invalid HMAC";
+}
+?>
+<pre>
+<a href="?url=https://google.com&h=999adflskejf">Google.com</a>
+</pre>
+```
+they use hmac to protect. but it's still vulnarable, init?
+
+what about this one?
+```html
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Parameter Input Validation</title>
+</head>
+<body>
+  <script>
+  // Function to get query parameter by name
+  function getQueryParam(name) {
+    var urlParams = new URLSearchParams (window.location.search); 
+    return urlParams.get(name);
+  }
+
+  // Get the input parameter from the URL
+  var userInput = getQueryParam("url");
+
+  // Define the regular expression pattern
+  var regexPattern = /^((https?:)?\/\/([^/]+\.)?site\.(net|cn|app))?\/$/;
+
+  if (userInput && userInput.match(regexPattern)) {
+    // Redirect the user to the new location based on the user input 
+    window.location.href = userInput;
+  } else {
+    // If the input doesn't match the pattern or is missing, display an error message 
+    alert("Invalid input parameter or format");
+  }
+  </script>
+</body>
+</html>
+```
+in here we use **regex** to exploit. for example if u put `https://google.com?a=.site.net/` the regex is bypassed and we redirect to `google.com`.
