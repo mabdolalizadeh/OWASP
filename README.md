@@ -2,7 +2,8 @@
 first of all have a look at [payloads all the things](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master) and save it for other uses.
 
 > [!IMPORTANT]
-> [Orange](https://blog.orange.tw/) has good article to read.
+> [Orange](https://blog.orange.tw/) has good article to read.</br>
+> have a look at [memoryleaks](https://memoryleaks.ir/) too.
 
 
 ## Command Injection
@@ -550,3 +551,66 @@ what about this one?
 </html>
 ```
 in here we use **regex** to exploit. for example if u put `https://google.com?a=.site.net/` the regex is bypassed and we redirect to `google.com`.
+
+
+## Security Missconfiguration
+### Default Credentials
+in this missconfig an attacker logs in by **default** password or **weak** one. some teqniices for default password checking:
+- searching net for default password of sepecific product
+- brute force it -> a user, bunch of passwords
+- password spray attack -> a password, bunch of users
+
+> [!NOTE]
+> a usefult [site](https://github.com/danielmiessler/SecLists). visit for some security list.
+
+### Stack Trace Error
+send a value that programmer have no idea about it. for example in djago, disclosure `SECRET-KEY` will result remote code executaion *(RCE)*.
+read these:
+- [Remote Code Executaion in Facebook Server](https://blog.scrt.ch/2018/08/24/remote-code-execution-on-a-facebook-server/)
+- [Django debug mode to RCE in Microsoft acquisition](https://medium.com/@syedabuthahir/django-debug-mode-to-rce-in-microsoft-acquisition-189d27d08971)
+
+### Verb Tamper
+in short it means, we change `method` of http.
+`GET` -> `POST`, `POST` -> `PATCH` or anything you want.
+
+> [!TIP]
+> HTTP Verb Tampering is an **attack that bypasses an authentication or control system that is based on the HTTP Verb**
+
+not only http verb tamper can be used for authentication bypass, but also sometimes leads to information discolsure or even **IDOR** vulnarablity. *(What is it?)*
+
+### Force Browsing
+an attacker can use brute force technique to search for **unlinked contents** in the domain directory, such as temperory directories and files. and old backup and configuration files. these may sotre **sensetive information**. use these tools:
+- Fuzz Faster U Fool [(ffuf)](https://github.com/ffuf/ffuf) :fire:
+- Gobuster [gobuster](https://github.com/OJ/gobuster)
+-  The Web Fuzzer [(wfuzz)](https://github.com/xmendez/wfuzz)
+
+common file type to discover:
+```
+Version control Files: .git|.svn
+Backup Files: .zip|.tar.gz|.7z
+Bash Files: .bash|.sh
+Source Codes: .py|.phps|.go
+Package Files: composer.json|nmp_modules
+```
+
+#### FFUF
+a complete documentation of ffuz found [here](https://codingo.io/tools/ffuf/bounty/2020/09/17/everything-you-need-to-know-about-ffuf.html). we can use ffuf for:
+- directory brute force
+- file brute force (various extentions)
+- parameter fuzzing (not recomended)
+- header fuzzing
+- authentication brute force
+- etc
+
+### S3 Bucket Missconfiguration
+bucket is a **container for object store in Amazon s3**. u can store number of buckets in buckets:
+- each bucket has unique name
+- each bucket access is limited by permision
+  - owner can configure read and write and edit for anonymous users
+  - for example, `aws s3 ls s3://bucket_name/` list the objects
+- some websites are fully hosted in s3 bucket
+- if the permissions not configured well can be a missconfiguration
+
+buckets urls are like this: `bucketname.s3-website.something.amazonaws.com` so its clear that the first part b4 `s3-website` is **bucket name** and if we have missconfiguration whenever u remove the `-website` it shows u the bucket content.
+- `bucketname.s3-website.something.amazonaws.com` -> `bucketname.s3.something.amazonaws.com` to show contents
+
