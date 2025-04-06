@@ -614,3 +614,76 @@ bucket is a **container for object store in Amazon s3**. u can store number of b
 buckets urls are like this: `bucketname.s3-website.something.amazonaws.com` so its clear that the first part b4 `s3-website` is **bucket name** and if we have missconfiguration whenever u remove the `-website` it shows u the bucket content.
 - `bucketname.s3-website.something.amazonaws.com` -> `bucketname.s3.something.amazonaws.com` to show contents
 
+## SSRF
+Server-Side Request Forgery is a vulnarability which let an attacker send **crafted request** from **backend server**. this is a vulnarable code:
+```php
+<?php
+/**
+ * check if the 'url' GET variable is set
+ */
+if (isset($_GET["img"])) {
+  $img = $_GET["img"];
+  /**
+   * send a request vulnarable to SSRF since
+   * no validation is being done on $url
+   * b4 sending the request
+   */
+
+  $image = fopen($img, 'rb');
+  /**
+   * dump contents of image
+   */
+  fpassthru($image);
+}
+?>
+<!DECOTYPY html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cat</title>
+</head>
+<body>
+  <img src="/?img=cat.gif">
+</body>
+</html>
+```
+usually in ssrf attacker try to access internal server. it brute force all ports to find an open port.
+```
+https://test.com/?img=https://test.com:8000/
+```
+
+```mermaid
+flowchart LR
+    attacker([Attacker])
+    vulnerable[/"Vulnerable"/]
+    internal[/"Internal"/]
+
+    subgraph Network
+        direction TB
+        vulnerable
+        internal
+    end
+
+    attacker --> vulnerable
+    vulnerable --> attacker
+
+    vulnerable --> internal
+    internal --> vulnerable
+
+
+    style Network stroke-dasharray: 5 5
+    style attacker fill:#fff,stroke:#000,stroke-width:2px
+    style vulnerable fill:#000,color:#fff
+    style internal fill:#000,color:#fff
+```
+
+> [!IMPORTANT]
+> in SSRF u dont have to send just http u can send tcp to
+> and u can send request to in internal devices too
+
+### Detection
+SSRF can be full-blown or blind:
+- in normal mode, detection is based on the server response
+- in blind mode, detection is based on the measures, such as time. sometimes out of band technique helps us to detect the flow:
+
