@@ -3,8 +3,8 @@ first of all have a look at [payloads all the things](https://github.com/swissky
 
 > [!IMPORTANT]
 > [Orange](https://blog.orange.tw/) has good article to read.</br>
-> have a look at [memoryleaks](https://memoryleaks.ir/) too.
-> [PortSwigger](https://portswigger.net/) has good labs to learn.
+> have a look at [memoryleaks](https://memoryleaks.ir/) too.</br>
+> [PortSwigger](https://portswigger.net/) has good labs to learn.</br>
 > use `wappalyzer` extention
 
 ## Command Injection
