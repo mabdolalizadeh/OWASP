@@ -4,7 +4,8 @@ first of all have a look at [payloads all the things](https://github.com/swissky
 > [!IMPORTANT]
 > [Orange](https://blog.orange.tw/) has good article to read.</br>
 > have a look at [memoryleaks](https://memoryleaks.ir/) too.
-
+> [PortSwigger](https://portswigger.net/) has good labs to learn.
+> use `wappalyzer` extention
 
 ## Command Injection
 ### Basics
